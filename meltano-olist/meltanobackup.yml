@@ -1,0 +1,76 @@
+version: 1
+default_environment: dev
+project_id: 6c98d7c2-a788-45cd-bb6f-7cdb254109be
+environments:
+- name: dev
+- name: staging
+- name: prod
+plugins:
+  extractors:
+  - name: tap-csv
+    variant: meltanolabs
+    pip_url: git+https://github.com/MeltanoLabs/tap-csv.git
+    config:
+      files:
+      - entity: customers
+        path: 
+          /home/joseph/5m-data-2.6-data-pipelines-orchestration/kaggle-data/cleaned_kaggle_dataset/olist_customers_dataset.csv
+        keys:
+        - customer_id
+      - entity: geolocation
+        path: 
+          /home/joseph/5m-data-2.6-data-pipelines-orchestration/kaggle-data/cleaned_kaggle_dataset/olist_geolocation_dataset.csv
+        keys:
+        - geolocation_zip_code_prefix
+      - entity: orders
+        path: 
+          /home/joseph/5m-data-2.6-data-pipelines-orchestration/kaggle-data/cleaned_kaggle_dataset/olist_orders_dataset.csv
+        keys:
+        - order_id
+      - entity: order_items
+        path: 
+          /home/joseph/5m-data-2.6-data-pipelines-orchestration/kaggle-data/cleaned_kaggle_dataset/olist_order_items_dataset.csv
+        keys:
+        - order_id
+        - order_item_id
+      - entity: order_payments
+        path: 
+          /home/joseph/5m-data-2.6-data-pipelines-orchestration/kaggle-data/cleaned_kaggle_dataset/olist_order_payments_dataset.csv
+        keys:
+        - order_id
+        - payment_sequential
+      - entity: order_reviews
+        path: 
+          /home/joseph/5m-data-2.6-data-pipelines-orchestration/kaggle-data/cleaned_kaggle_dataset/olist_order_reviews_dataset.csv
+        keys:
+        - review_id
+      - entity: products
+        path: 
+          /home/joseph/5m-data-2.6-data-pipelines-orchestration/kaggle-data/cleaned_kaggle_dataset/olist_products_dataset.csv
+        keys:
+        - product_id
+      - entity: sellers
+        path: 
+          /home/joseph/5m-data-2.6-data-pipelines-orchestration/kaggle-data/cleaned_kaggle_dataset/olist_sellers_dataset.csv
+        keys:
+        - seller_id
+      - entity: product_category_translation
+        path: 
+          /home/joseph/5m-data-2.6-data-pipelines-orchestration/kaggle-data/cleaned_kaggle_dataset/product_category_name_translation.csv
+        keys:
+        - product_category_name
+      add_metadata_columns: false
+      csv_files_definition: ''
+  loaders:
+  - name: target-bigquery
+    variant: z3z1ma
+    pip_url: git+https://github.com/z3z1ma/target-bigquery.git
+    config:
+      dataset: rawolist
+      denormalized: true
+      add_metadata_columns: false
+      flattening_enabled: true
+      flattening_max_depth: 1
+      method: batch_job
+      project: dasi-first-project
+      batch_size: 104857600

@@ -1,0 +1,34 @@
+version: 1
+default_environment: dev
+project_id: 6c98d7c2-a788-45cd-bb6f-7cdb254109be
+environments:
+- name: dev
+- name: staging
+- name: prod
+plugins:
+  extractors:
+  - name: tap-csv
+    variant: meltanolabs
+    pip_url: git+https://github.com/MeltanoLabs/tap-csv.git
+    config:
+      files:
+      - entity: product_category_translation
+        path: 
+          /home/joseph/5m-data-2.6-data-pipelines-orchestration/kaggle-data/cleaned_kaggle_dataset/product_category_name_translation.csv
+        keys:
+        - product_category_name
+      add_metadata_columns: false
+      csv_files_definition: ''
+  loaders:
+  - name: target-bigquery
+    variant: z3z1ma
+    pip_url: git+https://github.com/z3z1ma/target-bigquery.git
+    config:
+      dataset: rawolist
+      denormalized: true
+      add_metadata_columns: false
+      flattening_enabled: true
+      flattening_max_depth: 1
+      method: batch_job
+      project: dasi-first-project
+      batch_size: 104857600

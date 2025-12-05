@@ -550,3 +550,85 @@ To follow the progress of the materialization and monitor the logs, each run has
 The metadata of the asset are available under the respective assets name in the Overview tab of `pandas_job` or in the Assets tab. Click on the 'Show Markdown' to see the redered markdown or image.
 
 You can also view the Job Schedule in the Schedules tab of `dagster_orchestration`. The schedule will run every day at midnight.
+
+
+Olist project.
+
+a.conda activate elt
+
+b. cloud auth application-default login
+
+
+1. pip install kagglehub
+2. created a python file download_kaggle.py in Kaggle-data folder. 
+3. python download_kaggle.py would download and create a dataset kaggle_dataset and all the CSV files.
+4. Now automate the tap from Kaggle and target to bigquery using Meltano.
+5. Create  meltano init meltano-olist  ( "meltano-olist" )
+6. CD to meltano-olist
+7. meltano add extractor tap-csv  "to add the extractor for csv files."
+
+8. meltano config tap-csv set --interactive
+
+select [5]:  "Test with few files"
+[
+  {
+    "entity": "customers",
+    "path": "../kaggle-data/olist_customers_dataset.csv",
+    "keys": ["customer_id"]
+  },
+  {
+    "entity": "orders",
+    "path": "../kaggle-data/olist_orders_dataset.csv",
+    "keys": ["order_id"]
+  },
+  {
+    "entity": "order_items",
+    "path": "../kaggle-data/olist_order_items_dataset.csv",
+    "keys": ["order_item_id"]
+  }
+]
+
+option [1[]: "True"
+
+Test your configuration:
+
+```bash
+meltano config tap-csv test
+```
+
+We will now add a loader to load the data into BigQuery.
+
+```bash
+meltano add loader target-bigquery
+```
+
+```bash
+meltano config target-bigquery set --interactive
+```
+
+Set the following options:
+
+- `batch_size`: `104857600`
+- `credentials_path`: _full path to the service account key file_
+- `dataset`: `resale`
+- `denormalized`: `true`
+- `flattening_enabled`: `true`
+- `flattening_max_depth`: `1`
+- `method`: `batch_job`
+- `project`: *your_gcp_project_id*
+
+You can refer to an example of the `meltano.yml` in the `solutions` branch of the lesson 2.6 repo [here](https://github.com/su-ntu-ctp/5m-data-2.6-data-pipelines-orchestration/blob/solutions/solutions/meltano-ingestion/meltano.yml).
+
+### Run Supabase (Postgres) to BigQuery
+
+We can now run the full ingestion (extract-load) pipeline from CSV folder to BigQuery.
+
+```bash
+meltano run tap-csv target-bigquery
+```
+
+You will see the logs printed out in your console. Once the pipeline is completed, you can check the data in BigQuery.
+
+
+
+
